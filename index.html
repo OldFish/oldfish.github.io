@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>扫码支付-商户收款</title>
+    <script type="text/javascript" src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://lib.baomitu.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <link href="./css/style.css" rel="stylesheet">
+</head>
+<body id="color">
+    <div class="code-item" id="code-all" style="display: none;">
+        <div id="ui-head" class="ui-panel ui-flex-pack-center ui-flex-align-center" style="text-align: center;">
+            <img class="ui-qlogo" id="qlogo" src="" />
+            <div><h1>扫码支付</h1><h2 id="qnick">商户专用收款码</h2></div>
+        </div>
+        <div class="ui-box ui-panel ui-flex-align-center">
+            <div id="ui-content" class="ui-panel ui-flex-ver ui-flex-pack-center">
+                <div class="ui-tips">请长按二维码支付</div>
+                <br>
+                <div class="ui-qrcode"><img id="page-url" /></div>
+                <div class="ui-paytext"></div>
+                <div id="ui-setps" class="ui-panel ui-flex-pack-center">
+                    <div>
+                        <div class="ui-circle">1</div>
+                        <i class="icon iconfont icon-changan"></i>
+                        <div class="ui-padtop10">长按二维码</div>
+                    </div>
+                    <div>
+                        <div class="ui-circle">2</div>
+                        <i class="icon iconfont icon-erweima"></i>
+                        <div class="ui-padtop10">扫描二维码</div>
+                    </div>
+                    <div>
+                        <div class="ui-circle">3</div>
+                        <i class="icon iconfont icon-icon-check-solid"></i>
+                        <div class="ui-padtop10">输入金额支付</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $(document).bind("contextmenu", function (e) { return false; });
+            $(document).bind("keydown", function (e) { e = window.event || e; if (e.keyCode == 116 || e.keyCode == 118 || e.keyCode == 122 || e.keyCode == 123 || e.keyCode == 83) { e.keyCode = 0; return false; } });
+        });
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+        var setting = {
+            uin: GetQueryString('uin') != null ? GetQueryString('uin') : "441221482",
+            qqUrl: GetQueryString('qq') != null ? GetQueryString('qq') : "https://i.qianbao.qq.com/wallet/sqrcode.htm?m=tenpay&f=wallet&u=441221482&a=1&n=OldFish+%C2%B2%C2%BA%C2%B9%E2%81%B9&ac=CAEQ6oKy0gEY9-rG7AU%3D_xxx_sign",
+            wechatUrl: GetQueryString('vx') != null ? GetQueryString('vx') : "wxp://f2f0tEI4dGiDBd5MCgpUvekj4mgS7hDvR-hq",
+            aliUrl: GetQueryString('ali') != null ? GetQueryString('ali') : "HTTPS://QR.ALIPAY.COM/FKX08641IPKVQP9J0OC537",
+            shortUrl: GetQueryString('short') != null ? GetQueryString('short') : window.location.href
+        }
+        function ElseAlipay(s_height) {
+            document.getElementById("code-all").style.height = s_height + 'px';
+            document.getElementById("code-all").style.display = "block";
+            document.getElementById("qlogo").src = 'https://q2.qlogo.cn/headimg_dl?spec=100&dst_uin=' + setting.uin;
+            document.title = '扫码支付-商户收款';
+            document.getElementById("qnick").innerHTML = "商户收款";
+        }
+        function convertCanvasToImage() {
+            var canvas = document.getElementsByTagName('canvas')[0];
+            var image = new Image();
+            data = canvas.toDataURL("image/jpeg");
+            return data;
+        }
+        var s_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        if (navigator.userAgent.match(/Alipay/i)) {
+            window.location.href = setting.aliUrl;
+        } else if (navigator.userAgent.match(/MicroMessenger\//i)) {
+            ElseAlipay(s_height);
+            document.body.style.backgroundColor = "#54bc6e";
+            $("#page-url").qrcode(setting.wechatUrl);
+            document.getElementById("page-url").src = convertCanvasToImage();
+        } else if (navigator.userAgent.match(/QQ\//i)) {
+            ElseAlipay(s_height);
+            document.body.style.backgroundColor = "#049fda";
+            $("#page-url").qrcode(setting.qqUrl);
+            document.getElementById("page-url").src = convertCanvasToImage();
+        } else if (navigator.userAgent.match(/Windows/i)) {
+            ElseAlipay(s_height);
+            document.body.style.backgroundColor = "#795548";
+            $(".ui-tips").html('手机扫码支付');
+            $("#page-url").qrcode(setting.shortUrl);
+            document.getElementById("page-url").src = convertCanvasToImage();
+            //document.write('<div style="color: #fff;text-align: center;margin-top: 20%;">请使用手机QQ/微信/支付宝打开</div>');
+        } else {
+            document.body.style.background = "#FFF";
+        }
+    </script>
+</body>
+</html>
